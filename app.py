@@ -25,7 +25,9 @@ def get_embedding(text):
     
     # Mengambil last hidden state dan menghitung rata-rata untuk embedding
     last_hidden_state = outputs.last_hidden_state.mean(dim=1).squeeze()
-    return last_hidden_state.numpy()
+    
+    # Memastikan tensor ada di CPU sebelum memanggil .numpy()
+    return last_hidden_state.cpu().numpy()
 
 # Dataset Dummy untuk Latihan (ganti dengan dataset asli Anda)
 # Data latih dan label
