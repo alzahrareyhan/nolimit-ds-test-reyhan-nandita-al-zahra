@@ -1,6 +1,6 @@
 # Sentiment Analysis Classifier with DistilBERT and Scikit-Learn Classifier
 ## About
-This app predicts the sentiment of movie reviews. It also gives you the closest review in similarty search. You can use the deployed version of this [app]()
+This app predicts the sentiment of movie reviews. It also gives you the closest review in similarty search. You can use the deployed version of this [app](https://nolimit-ds-test-reyhan-nandita-al-zahra-dq4eb8wx2dya4vtdg56nv5.streamlit.app/)
 - Model used: [disitillBERT](https://huggingface.co/distilbert/distilbert-base-uncased) 
 - Dataset used: [dataset](https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews) , License: unknown
 - Framework and deploy: [streamlit + streamlit]()
