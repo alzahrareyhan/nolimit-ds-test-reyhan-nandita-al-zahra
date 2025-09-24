@@ -7,27 +7,40 @@ from sklearn.metrics.pairwise import cosine_similarity
 import torch
 import numpy as np
 
-# Path ke folder model
+# Path ke folder model (gunakan model pre-trained jika model Anda bermasalah)
 model_path = 'saved_model'  # Sesuaikan dengan path model Anda
 
 # Memuat model DistilBERT untuk ekstraksi embedding
-distilbert_model = DistilBertModel.from_pretrained(model_path)
-tokenizer = DistilBertTokenizer.from_pretrained(model_path)
+try:
+    distilbert_model = DistilBertModel.from_pretrained(model_path)
+    tokenizer = DistilBertTokenizer.from_pretrained(model_path)
+    st.write("Model berhasil dimuat.")
+except Exception as e:
+    st.error(f"Terjadi kesalahan saat memuat model: {e}")
+    distilbert_model = DistilBertModel.from_pretrained('distilbert-base-uncased')
+    tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
+
+# Memastikan perangkat yang digunakan (GPU jika tersedia, jika tidak CPU)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+distilbert_model = distilbert_model.to(device)
 
 # Fungsi untuk mendapatkan embedding langsung menggunakan DistilBERT
 def get_embedding(text):
-    # Tokenisasi input teks
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
-    
-    # Mengambil embedding dari DistilBERT
-    with torch.no_grad():
-        outputs = distilbert_model(**inputs)
-    
-    # Mengambil last hidden state dan menghitung rata-rata untuk embedding
-    last_hidden_state = outputs.last_hidden_state.mean(dim=1).squeeze()
-    
-    return last_hidden_state.cpu().numpy()
+    try:
+        # Tokenisasi input teks
+        inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True).to(device)
+        
+        # Mengambil embedding dari DistilBERT
+        with torch.no_grad():
+            outputs = distilbert_model(**inputs)
+        
+        # Mengambil last hidden state dan menghitung rata-rata untuk embedding
+        last_hidden_state = outputs.last_hidden_state.mean(dim=1).squeeze()
 
+        return last_hidden_state.cpu().numpy()
+    except Exception as e:
+        st.error(f"Error dalam mendapatkan embedding: {e}")
+        return np.zeros(768)  # Return dummy value jika terjadi error
 
 # Data latih dan label
 train_texts = ["I love this movie", "This movie is bad", "Amazing film", "Not worth watching", "Great movie"]
@@ -55,7 +68,7 @@ st.write(f'Accuracy: {accuracy * 100:.2f}%')
 # Fungsi untuk prediksi sentimen menggunakan model sklearn
 def predict_sentiment(text):
     # Tokenisasi input teks
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True).to(device)
     
     # Mengambil embedding dari DistilBERT dan langsung melakukan prediksi
     with torch.no_grad():
