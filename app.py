@@ -1,9 +1,13 @@
 import streamlit as st
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 import torch
+from safetensors.torch import load_file
 
 # Path ke folder model (pastikan folder saved_model ada dan berisi model yang benar)
 model_path = 'saved_model'
+
+# Memuat state_dict dari file .safetensors
+state_dict = load_file(f"{model_path}/model.safetensors")
 
 # Tentukan perangkat yang digunakan (menggunakan CPU)
 device = torch.device("cpu")  # Gunakan CPU untuk deployment
@@ -11,7 +15,10 @@ device = torch.device("cpu")  # Gunakan CPU untuk deployment
 # Inisialisasi model DistilBERT dengan konfigurasi yang sesuai
 model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labels=2)
 
-# Pastikan model dipindahkan ke perangkat yang sesuai (CPU)
+# Memuat state_dict ke model
+model.load_state_dict(state_dict)
+
+# Pastikan model dipindahkan ke perangkat yang sesuai
 model.to(device)
 
 # Memuat tokenizer
