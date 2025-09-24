@@ -1,34 +1,26 @@
 import streamlit as st
-from transformers import DistilBertForSequenceClassification, DistilBertTokenizer
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 import torch
 
 # Path ke folder model
 model_path = 'saved_model'  # Sesuaikan dengan path model Anda
 
-# Memuat model DistilBERT untuk klasifikasi (dengan output hidden states)
-model = DistilBertForSequenceClassification.from_pretrained(model_path, output_hidden_states=True)
+# Memuat model dan tokenizer
+model = DistilBertForSequenceClassification.from_pretrained(model_path)
 tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
-# Pastikan model di-load ke device yang sesuai (GPU jika tersedia)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = model.to(device)
-
-# Fungsi untuk prediksi dan mendapatkan embedding
-def predict_sentiment_and_embedding(text):
+# Fungsi untuk prediksi
+def predict_sentiment(text):
     # Tokenisasi input teks
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512).to(device)
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
     
-    # Prediksi menggunakan model dengan hidden states
+    # Prediksi menggunakan model
     with torch.no_grad():
         outputs = model(**inputs)
     
-    # Mengambil hidden states
-    hidden_states = outputs.hidden_states
-    last_hidden_state = hidden_states[-1]  # Mengambil last hidden state
-    embeddings = last_hidden_state.mean(dim=1).squeeze().cpu().tolist()  # Rata-rata embedding
-    predictions = torch.argmax(outputs.logits, dim=-1)  # Prediksi sentimen (0: negatif, 1: positif)
-    
-    return embeddings, predictions.item()
+    # Menghitung prediksi (0: negatif, 1: positif)
+    predictions = torch.argmax(outputs.logits, dim=-1)
+    return predictions.item()
 
 # Judul dan penjelasan aplikasi
 st.title('Sentiment Analysis - Movie Reviews with DistilBERT')
@@ -40,21 +32,12 @@ user_input = st.text_area("Enter your movie review here:")
 # Tombol Submit
 if st.button("Submit"):
     if user_input:
-        # Mendapatkan embedding dan prediksi sentimen
-        embeddings, sentiment = predict_sentiment_and_embedding(user_input)
+        sentiment = predict_sentiment(user_input)
         
         # Menampilkan hasil prediksi
         if sentiment == 1:
             st.success("The sentiment is **Positive**!")
         else:
             st.error("The sentiment is **Negative**!")
-        
-        # Menampilkan embedding (hanya sebagian agar tidak terlalu panjang)
-        st.write("Embedding (vector representation of the text):")
-        st.write(embeddings[:10])  # Menampilkan hanya sebagian dari embedding (misalnya 10 nilai pertama)
-        
-        # Menampilkan embedding panjang secara lebih terstruktur (opsional)
-        if len(embeddings) > 10:
-            st.write("... and more values in the embedding vector.")
     else:
         st.warning("Please enter a movie review to analyze.")
