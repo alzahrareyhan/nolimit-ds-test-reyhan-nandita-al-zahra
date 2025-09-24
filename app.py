@@ -9,9 +9,7 @@ model_path = 'saved_model'
 model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labels=2)
 tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
-# Memastikan model menggunakan perangkat yang tepat (GPU atau CPU)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = model.to(device)
+
 
 # Fungsi untuk prediksi sentimen menggunakan model DistilBERT
 def predict_sentiment(text):
