@@ -18,6 +18,11 @@ model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labe
 # Muat state_dict ke model
 model.load_state_dict(state_dict)
 
+# Pastikan model dipindahkan ke perangkat yang sesuai
+model.to(device)
+
+# Memuat tokenizer
+tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
 # Fungsi untuk prediksi sentimen menggunakan model DistilBERT
 def predict_sentiment(text):
@@ -28,14 +33,14 @@ def predict_sentiment(text):
     with torch.no_grad():
         outputs = model(**inputs)
     
-    # Mengambil logits dan menghitung prediksi sentimen (0 = Negatif, 1 = Positif)
+    # Cek apakah tensor valid dan memiliki data sebelum memanggil .item()
     logits = outputs.logits
+    if logits.is_meta:
+        raise RuntimeError("Received meta tensor, cannot perform .item()")
+
     predictions = torch.argmax(logits, dim=-1)  # Mengambil prediksi dengan nilai tertinggi
     
     return predictions.item()
-
-# Memuat tokenizer
-tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
 # Judul dan penjelasan aplikasi
 st.title('Sentiment Analysis - Movie Reviews with DistilBERT')
@@ -47,13 +52,16 @@ user_input = st.text_area("Enter your movie review here:")
 # Tombol Submit
 if st.button("Submit"):
     if user_input:
-        # Prediksi sentimen dengan model DistilBERT
-        sentiment = predict_sentiment(user_input)
-        
-        # Menampilkan hasil prediksi
-        if sentiment == 1:
-            st.success("The sentiment is **Positive**!")
-        else:
-            st.error("The sentiment is **Negative**!")
+        try:
+            # Prediksi sentimen dengan model DistilBERT
+            sentiment = predict_sentiment(user_input)
+            
+            # Menampilkan hasil prediksi
+            if sentiment == 1:
+                st.success("The sentiment is **Positive**!")
+            else:
+                st.error("The sentiment is **Negative**!")
+        except RuntimeError as e:
+            st.error(f"Error: {e}")
     else:
         st.warning("Please enter a movie review to analyze.")
