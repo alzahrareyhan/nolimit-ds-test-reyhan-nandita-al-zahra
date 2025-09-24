@@ -9,16 +9,20 @@ model_path = 'saved_model'
 # Memuat model dari file .safetensors
 state_dict = load_file(f"{model_path}/model.safetensors")
 
-# Inisialisasi model dengan konfigurasi (gunakan model DistilBERT)
-model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labels=2)
-model.load_state_dict(state_dict)  # Muat state_dict dari safetensors
-tokenizer = DistilBertTokenizer.from_pretrained(model_path)
-
 # Tentukan perangkat yang digunakan (menggunakan CPU)
 device = torch.device("cpu")  # Gunakan CPU untuk deployment
 
-# Memindahkan model ke perangkat yang sesuai (CPU)
-model.to(device)
+# Inisialisasi model DistilBERT dengan konfigurasi yang sesuai
+model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labels=2)
+
+# Muat state_dict ke model
+model.load_state_dict(state_dict)
+
+# Memastikan model menggunakan perangkat yang tepat
+model = model.to(device)
+
+# Memuat tokenizer
+tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
 # Fungsi untuk prediksi sentimen menggunakan model DistilBERT
 def predict_sentiment(text):
