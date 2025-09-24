@@ -14,8 +14,8 @@ model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labe
 model.load_state_dict(state_dict)  # Muat state_dict dari safetensors
 tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
-# Memastikan model menggunakan perangkat yang tepat (GPU atau CPU)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# Tentukan perangkat yang digunakan (menggunakan CPU)
+device = torch.device("cpu")  # Gunakan CPU untuk deployment
 model = model.to(device)
 
 # Fungsi untuk prediksi sentimen menggunakan model DistilBERT
