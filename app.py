@@ -18,22 +18,25 @@ import torch
 
 # Fungsi untuk memindahkan model dan input ke perangkat yang sesuai
 def predict(text, tokenizer, model):
+    # Tokenisasi input teks
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
     
-    # Tentukan perangkat CPU secara eksplisit
-    device = torch.device('cpu')  # Gunakan 'cuda' jika GPU tersedia, 'cpu' untuk fallback
+    # Tentukan perangkat yang sesuai (CPU atau GPU)
+    device = torch.device('cpu')  # Menggunakan CPU, atau 'cuda' jika GPU tersedia
     
-    # Pindahkan model menggunakan to_empty() untuk model meta
-    #model = model.to_empty(device)  # Menggunakan to_empty() untuk model yang belum sepenuhnya dimuat
+    # Pindahkan model dan inputs ke perangkat yang sesuai (CPU)
+    model.to(device)
     inputs = {key: value.to(device) for key, value in inputs.items()}
     
     # Melakukan prediksi
     with torch.no_grad():
         logits = model(**inputs).logits
         
-        # Pastikan tensor berada di CPU sebelum menggunakan .item()
-        prediction = torch.argmax(logits, dim=-1).cpu()
-        return prediction.item()
+        # Pastikan tensor berada di CPU sebelum melakukan .argmax() dan .item()
+        logits = logits.cpu()  # Memindahkan logits ke CPU (jika diperlukan)
+        prediction = torch.argmax(logits, dim=-1).item()  # Mengambil nilai prediksi sebagai scalar
+        
+    return prediction
 
 
 # Memuat model
