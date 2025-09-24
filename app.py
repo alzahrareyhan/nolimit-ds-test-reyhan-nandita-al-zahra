@@ -8,7 +8,8 @@ import torch
 import numpy as np
 
 # Path ke folder model
-model_path = 'saved_model'  # Sesuaikan dengan path model Anda
+model_path = 'saved_model'  
+
 
 # Memuat model DistilBERT untuk ekstraksi embedding
 distilbert_model = DistilBertModel.from_pretrained(model_path)
