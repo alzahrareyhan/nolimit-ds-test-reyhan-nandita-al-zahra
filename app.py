@@ -15,15 +15,17 @@ def load_model():
 
 import torch
 
+import torch
+
 # Fungsi untuk memindahkan model dan input ke perangkat yang sesuai
 def predict(text, tokenizer, model):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
     
     # Tentukan perangkat CPU secara eksplisit
-    device = torch.device('cpu')
-    
-    # Pindahkan model dan inputs ke CPU
-    model.to(device)
+    device = torch.device('cpu')  # Menggunakan CPU untuk memastikan kompatibilitas
+
+    # Gunakan `to_empty()` untuk memindahkan model jika tensor meta
+    model = model.to_empty(device)  # Menggunakan to_empty() untuk model yang belum sepenuhnya dimuat
     inputs = {key: value.to(device) for key, value in inputs.items()}
     
     # Melakukan prediksi
@@ -33,7 +35,6 @@ def predict(text, tokenizer, model):
         # Pastikan tensor berada di CPU sebelum menggunakan .item()
         prediction = torch.argmax(logits, dim=-1).cpu()
         return prediction.item()
-
 
 # Memuat model
 tokenizer, model = load_model()
