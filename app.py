@@ -1,13 +1,12 @@
 import streamlit as st
 import torch
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-# Memuat model dan tokenizer
 @st.cache_resource
 def load_model():
-    model_path = 'saved_model/model.safetensors'
+    model_path = 'saved_model/model'  # Gunakan path tanpa ekstensi safetensors jika bisa menggunakan model standar
     
-    # Anda harus menyesuaikan dengan model yang digunakan, misalnya model sentiment analysis atau lainnya
+    # Tokenizer dan model standar Hugging Face
     tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
     model = AutoModelForSequenceClassification.from_pretrained(model_path)
     
