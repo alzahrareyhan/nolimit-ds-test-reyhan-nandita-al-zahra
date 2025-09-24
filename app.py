@@ -9,10 +9,14 @@ model_path = 'saved_model'  # Sesuaikan dengan path model Anda
 model = DistilBertForSequenceClassification.from_pretrained(model_path, output_hidden_states=True)
 tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
+# Pastikan model di-load ke device yang sesuai (GPU jika tersedia)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = model.to(device)
+
 # Fungsi untuk prediksi dan mendapatkan embedding
 def predict_sentiment_and_embedding(text):
     # Tokenisasi input teks
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512).to(device)
     
     # Prediksi menggunakan model dengan hidden states
     with torch.no_grad():
@@ -21,7 +25,7 @@ def predict_sentiment_and_embedding(text):
     # Mengambil hidden states
     hidden_states = outputs.hidden_states
     last_hidden_state = hidden_states[-1]  # Mengambil last hidden state
-    embeddings = last_hidden_state.mean(dim=1).squeeze().tolist()  # Rata-rata embedding
+    embeddings = last_hidden_state.mean(dim=1).squeeze().cpu().tolist()  # Rata-rata embedding
     predictions = torch.argmax(outputs.logits, dim=-1)  # Prediksi sentimen (0: negatif, 1: positif)
     
     return embeddings, predictions.item()
@@ -45,8 +49,12 @@ if st.button("Submit"):
         else:
             st.error("The sentiment is **Negative**!")
         
-        # Menampilkan embedding
+        # Menampilkan embedding (hanya sebagian agar tidak terlalu panjang)
         st.write("Embedding (vector representation of the text):")
-        st.write(embeddings)  # Menampilkan embedding sebagai vektor
+        st.write(embeddings[:10])  # Menampilkan hanya sebagian dari embedding (misalnya 10 nilai pertama)
+        
+        # Menampilkan embedding panjang secara lebih terstruktur (opsional)
+        if len(embeddings) > 10:
+            st.write("... and more values in the embedding vector.")
     else:
         st.warning("Please enter a movie review to analyze.")
