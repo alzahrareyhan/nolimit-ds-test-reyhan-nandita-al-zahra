@@ -8,11 +8,11 @@ import torch
 import numpy as np
 
 # Path ke folder model
-model_path = 'saved_model'  # Sesuaikan dengan path model Anda
+model_path = 'saved_model'  
 
 # Memuat model DistilBERT untuk ekstraksi embedding
-ddistilbert_model = DistilBertModel.from_pretrained('distilbert-base-uncased')
-tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
+distilbert_model = DistilBertModel.from_pretrained(model_path)
+tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
 # Fungsi untuk mendapatkan embedding
 def get_embedding(text):
@@ -47,9 +47,6 @@ y_pred = clf.predict(X_test)
 
 # Evaluasi akurasi model
 accuracy = accuracy_score(y_test, y_pred)
-
-# Menampilkan akurasi
-#st.write(f'Accuracy: {accuracy * 100:.2f}%')
 
 # Fungsi untuk prediksi sentimen menggunakan model sklearn
 def predict_sentiment(text):
