@@ -19,7 +19,7 @@ model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labe
 model.load_state_dict(state_dict)
 
 # Memindahkan model ke perangkat yang sesuai (CPU)
-model.to(streamlit)
+#model.to(streamlit)
 
 # Memuat tokenizer
 tokenizer = DistilBertTokenizer.from_pretrained(model_path)
