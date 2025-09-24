@@ -24,7 +24,7 @@ def predict(text, tokenizer, model):
     device = torch.device('cpu')  # Gunakan 'cuda' jika GPU tersedia, 'cpu' untuk fallback
     
     # Pindahkan model menggunakan to_empty() untuk model meta
-    model = model.to_empty(device)  # Menggunakan to_empty() untuk model yang belum sepenuhnya dimuat
+    #model = model.to_empty(device)  # Menggunakan to_empty() untuk model yang belum sepenuhnya dimuat
     inputs = {key: value.to(device) for key, value in inputs.items()}
     
     # Melakukan prediksi
