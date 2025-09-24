@@ -33,7 +33,6 @@ def get_embedding(text):
     return last_hidden_state.cpu().numpy()
 
 
-# Dataset Dummy untuk Latihan (ganti dengan dataset asli Anda)
 # Data latih dan label
 train_texts = ["I love this movie", "This movie is bad", "Amazing film", "Not worth watching", "Great movie"]
 train_labels = [1, 0, 1, 0, 1]  # 1 = Positif, 0 = Negatif
@@ -55,7 +54,7 @@ y_pred = clf.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 
 # Menampilkan akurasi
-#st.write(f'Accuracy: {accuracy * 100:.2f}%')
+st.write(f'Accuracy: {accuracy * 100:.2f}%')
 
 # Fungsi untuk prediksi sentimen menggunakan model sklearn
 def predict_sentiment(text):
