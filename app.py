@@ -7,7 +7,7 @@ from safetensors.torch import load_file
 model_path = 'saved_model'
 
 # Memuat state_dict dari file safetensors
-state_dict = load_file(f"{model_path}")
+state_dict = load_file(f"{model_path}/model.safetensors")
 
 # Tentukan perangkat yang digunakan (menggunakan CPU)
 device = torch.device("cpu")  # Gunakan CPU untuk deployment
@@ -19,7 +19,7 @@ model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labe
 model.load_state_dict(state_dict)
 
 # Memindahkan model ke perangkat yang sesuai (CPU)
-#model.to(device)
+model.to(streamlit)
 
 # Memuat tokenizer
 tokenizer = DistilBertTokenizer.from_pretrained(model_path)
