@@ -18,11 +18,9 @@ model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labe
 # Muat state_dict ke model
 model.load_state_dict(state_dict)
 
-# Memastikan model menggunakan perangkat yang tepat
-model = model.to(device)
-
-# Memuat tokenizer
-tokenizer = DistilBertTokenizer.from_pretrained(model_path)
+# Pastikan model tidak ada dalam meta tensor sebelum dipindahkan
+if hasattr(model, 'to_empty'):
+    model = model.to_empty(device)  # Gunakan to_empty() untuk menghindari masalah meta tensor
 
 # Fungsi untuk prediksi sentimen menggunakan model DistilBERT
 def predict_sentiment(text):
@@ -38,6 +36,9 @@ def predict_sentiment(text):
     predictions = torch.argmax(logits, dim=-1)  # Mengambil prediksi dengan nilai tertinggi
     
     return predictions.item()
+
+# Memuat tokenizer
+tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
 # Judul dan penjelasan aplikasi
 st.title('Sentiment Analysis - Movie Reviews with DistilBERT')
