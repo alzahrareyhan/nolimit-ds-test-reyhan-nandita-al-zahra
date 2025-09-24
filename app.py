@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 # Memuat dataset IMDB CSV (pastikan file imdb.csv ada di direktori yang sama dengan app.py)
 @st.cache
 def load_data():
-    df = pd.read_csv('imdb.csv')  # Ganti dengan path file yang sesuai jika tidak ada di direktori yang sama
+    df = pd.read_csv('IMDB/imdb.csv')  # Ganti dengan path file yang sesuai jika tidak ada di direktori yang sama
     return df
 
 # Muat data
