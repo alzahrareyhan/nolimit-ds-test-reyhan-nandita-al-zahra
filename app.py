@@ -1,12 +1,26 @@
 import streamlit as st
+import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-# Dataset Dummy untuk Latihan (ganti dengan dataset asli Anda)
-train_texts = ["I love this movie", "This movie is bad", "Amazing film", "Not worth watching", "Great movie"]
-train_labels = [1, 0, 1, 0, 1]  # 1 = Positif, 0 = Negatif
+# Memuat dataset IMDB CSV (pastikan file imdb.csv ada di direktori yang sama dengan app.py)
+@st.cache
+def load_data():
+    df = pd.read_csv('imdb.csv')  # Ganti dengan path file yang sesuai jika tidak ada di direktori yang sama
+    return df
+
+# Muat data
+df = load_data()
+
+# Menampilkan beberapa baris data untuk pengecekan
+st.write("Dataset Sample:")
+st.write(df.head())
+
+# Pisahkan fitur (review) dan label (sentiment)
+train_texts = df['review'].tolist()  # List ulasan (review)
+train_labels = df['sentiment'].tolist()  # List label sentimen (sentiment)
 
 # Membuat TF-IDF Vectorizer
 vectorizer = TfidfVectorizer()
@@ -38,7 +52,7 @@ def predict_sentiment(text):
     return sentiment[0]  # Mengembalikan hasil prediksi
 
 # Judul dan penjelasan aplikasi
-st.title('Sentiment Analysis - Movie Reviews')
+st.title('Sentiment Analysis - IMDB Movie Reviews')
 st.write("Enter a movie review, and the model will predict whether the sentiment is positive or negative.")
 
 # Input teks dari pengguna
