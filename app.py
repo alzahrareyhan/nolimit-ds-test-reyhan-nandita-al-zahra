@@ -1,15 +1,20 @@
 import streamlit as st
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+from safetensors import safe_open
 import torch
 
 # Path ke folder model (pastikan folder saved_model ada dan berisi model yang benar)
 model_path = 'saved_model'
 
 # Memuat model DistilBERT untuk klasifikasi sentimen dan tokenizer dari folder saved_model
-model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labels=2)
+model = DistilBertForSequenceClassification.from_pretrained(model_path, 
+                                                           from_safetensors=True, 
+                                                           num_labels=2)
 tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
-
+# Memastikan model menggunakan perangkat yang tepat (GPU atau CPU)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = model.to(device)
 
 # Fungsi untuk prediksi sentimen menggunakan model DistilBERT
 def predict_sentiment(text):
