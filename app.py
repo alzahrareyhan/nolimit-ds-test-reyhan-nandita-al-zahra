@@ -1,48 +1,31 @@
 import streamlit as st
+import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import torch
-
-# Fungsi untuk memuat model dan tokenizer dari Hugging Face
-@st.cache_resource
-def load_model():
-    # Ganti dengan nama model di Hugging Face
-    model_name = 'reyhannandita/analisissentimen'  
-    # Memuat tokenizer dan model dari Hugging Face
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSequenceClassification.from_pretrained(model_name)
-    
-    return tokenizer, model
-
-
-import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 # Fungsi untuk memindahkan model dan input ke perangkat yang sesuai
 def predict(text, tokenizer, model):
+    # Tokenisasi input teks
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
     
     # Tentukan perangkat yang sesuai (CPU atau GPU)
-    device = torch.device('cpu')  # Gunakan 'cuda' jika GPU tersedia, 'cpu' untuk fallback
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
-    # Pastikan model dimuat sepenuhnya
-    model = model.to(device)  # Memindahkan model ke perangkat yang sesuai
-    
-    # Pindahkan input ke perangkat yang sama dengan model
+    # Pindahkan input tensor ke perangkat yang sesuai (CPU atau GPU)
     inputs = {key: value.to(device) for key, value in inputs.items()}
     
-    # Melakukan prediksi
+    # Lakukan prediksi tanpa memindahkan model
     with torch.no_grad():
-        logits = model(**inputs).logits
-        
-        # Pastikan tensor berada di CPU sebelum menggunakan .item()
-        prediction = torch.argmax(logits, dim=-1).cpu()
-        return prediction.item()
+        logits = model(**inputs).logits  # Prediksi langsung
+        prediction = torch.argmax(logits, dim=-1).cpu().item()  # Ambil hasil prediksi dan pindahkan ke CPU
+    
+    return prediction
 
+# Muat tokenizer dan model dari Hugging Face
+model_name = 'reyhannandita/analisissentimen'  # Ganti dengan nama model di Hugging Face
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSequenceClassification.from_pretrained(model_name)
 
-# Memuat model
-tokenizer, model = load_model()
-
-# Streamlit UI
+# UI Streamlit
 st.title("Sentiment Analysis with Hugging Face Model")
 st.write("Masukkan teks untuk analisis sentimen")
 
