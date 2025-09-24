@@ -16,7 +16,9 @@ tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
 # Tentukan perangkat yang digunakan (menggunakan CPU)
 device = torch.device("cpu")  # Gunakan CPU untuk deployment
-model = model.to(device)
+
+# Menggunakan to_empty() untuk memindahkan model ke perangkat yang tepat
+model = model.to_empty(device)  # Gunakan to_empty() untuk menghindari meta tensor error
 
 # Fungsi untuk prediksi sentimen menggunakan model DistilBERT
 def predict_sentiment(text):
