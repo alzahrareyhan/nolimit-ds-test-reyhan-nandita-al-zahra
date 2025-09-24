@@ -9,7 +9,7 @@ model_path = 'saved_model'
 # Memuat state_dict dari file safetensors
 state_dict = load_file(f"{model_path}/model.safetensors")
 
-# Tentukan perangkat yang digunakan (menggunakan CPU karena kemungkinan tidak ada GPU di Streamlit Cloud)
+# Tentukan perangkat yang digunakan (menggunakan CPU)
 device = torch.device("cpu")  # Gunakan CPU untuk deployment
 
 # Inisialisasi model DistilBERT dengan konfigurasi yang sesuai
@@ -17,6 +17,9 @@ model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labe
 
 # Memuat state_dict ke model
 model.load_state_dict(state_dict)
+
+# Memindahkan model ke perangkat yang sesuai (CPU)
+model.to(device)
 
 # Memuat tokenizer
 tokenizer = DistilBertTokenizer.from_pretrained(model_path)
@@ -30,8 +33,11 @@ def predict_sentiment(text):
     with torch.no_grad():
         outputs = model(**inputs)
     
-    # Mengambil logits dan menghitung prediksi sentimen (0 = Negatif, 1 = Positif)
+    # Cek apakah tensor valid sebelum menggunakan .item()
     logits = outputs.logits
+    if logits.is_meta:
+        raise RuntimeError("Received meta tensor, cannot perform .item()")
+
     predictions = torch.argmax(logits, dim=-1)  # Mengambil prediksi dengan nilai tertinggi
     
     return predictions.item()
