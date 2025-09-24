@@ -1,46 +1,14 @@
 import streamlit as st
-from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from sklearn.metrics.pairwise import cosine_similarity
-import torch
-import numpy as np
-
-# Memuat model DistilBERT untuk klasifikasi sentimen dan tokenizer dari Hugging Face
-model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased')
-tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
-
-# Memastikan model menggunakan perangkat yang tepat (GPU atau CPU)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = model.to(device)
-
-# Fungsi untuk mendapatkan embedding dan prediksi sentimen
-def predict_sentiment_and_embedding(text):
-    # Tokenisasi input teks
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512).to(device)
-    
-    # Prediksi menggunakan model dengan hidden states
-    with torch.no_grad():
-        outputs = model(**inputs)
-    
-    # Mengambil logits dan menghitung prediksi sentimen (0 = Negatif, 1 = Positif)
-    logits = outputs.logits
-    predictions = torch.argmax(logits, dim=-1)  # Mengambil prediksi dengan nilai tertinggi
-    
-    # Mengambil hidden states untuk embedding
-    hidden_states = outputs.hidden_states
-    last_hidden_state = hidden_states[-1]  # Mengambil last hidden state
-    embeddings = last_hidden_state.mean(dim=1).squeeze().cpu().numpy()  # Rata-rata embedding
-    
-    return embeddings, predictions.item()
 
 # Dataset Dummy untuk Latihan (ganti dengan dataset asli Anda)
 train_texts = ["I love this movie", "This movie is bad", "Amazing film", "Not worth watching", "Great movie"]
 train_labels = [1, 0, 1, 0, 1]  # 1 = Positif, 0 = Negatif
 
 # Membuat TF-IDF Vectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
 vectorizer = TfidfVectorizer()
 
 # Mendapatkan fitur TF-IDF untuk teks
@@ -70,7 +38,7 @@ def predict_sentiment(text):
     return sentiment[0]  # Mengembalikan hasil prediksi
 
 # Judul dan penjelasan aplikasi
-st.title('Sentiment Analysis - Movie Reviews with DistilBERT')
+st.title('Sentiment Analysis - Movie Reviews')
 st.write("Enter a movie review, and the model will predict whether the sentiment is positive or negative.")
 
 # Input teks dari pengguna
@@ -79,21 +47,13 @@ user_input = st.text_area("Enter your movie review here:")
 # Tombol Submit
 if st.button("Submit"):
     if user_input:
-        # Mendapatkan embedding dan prediksi sentimen
-        embeddings, sentiment = predict_sentiment_and_embedding(user_input)
+        # Prediksi sentimen dengan model sklearn
+        sentiment = predict_sentiment(user_input)
         
         # Menampilkan hasil prediksi
         if sentiment == 1:
             st.success("The sentiment is **Positive**!")
         else:
             st.error("The sentiment is **Negative**!")
-        
-        # Menampilkan embedding (hanya sebagian agar tidak terlalu panjang)
-        st.write("Embedding (vector representation of the text):")
-        st.write(embeddings[:10])  # Menampilkan hanya sebagian dari embedding (misalnya 10 nilai pertama)
-        
-        # Menampilkan embedding panjang secara lebih terstruktur (opsional)
-        if len(embeddings) > 10:
-            st.write("... and more values in the embedding vector.")
     else:
         st.warning("Please enter a movie review to analyze.")
