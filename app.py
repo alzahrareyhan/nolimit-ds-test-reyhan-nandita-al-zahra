@@ -11,8 +11,8 @@ import numpy as np
 model_path = 'saved_model'  # Sesuaikan dengan path model Anda
 
 # Memuat model DistilBERT untuk ekstraksi embedding
-distilbert_model = DistilBertModel.from_pretrained(model_path)
-tokenizer = DistilBertTokenizer.from_pretrained(model_path)
+ddistilbert_model = DistilBertModel.from_pretrained('distilbert-base-uncased')
+tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
 # Fungsi untuk mendapatkan embedding
 def get_embedding(text):
