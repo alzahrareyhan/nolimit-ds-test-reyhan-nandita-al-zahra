@@ -51,7 +51,7 @@ Here's how you can run the app locally:
 
 1. clone this respository 
 ```
-git clone https://github.com/brokamal/nolimit-ds-test-mohammad-kamal
+git clone https://github.com/brokamal/nolimit-ds-test-reyhan-nandita-al-zahra
 ```
 2. install dependencies
 ```
