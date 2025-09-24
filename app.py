@@ -10,7 +10,6 @@ import numpy as np
 # Path ke folder model
 model_path = 'saved_model'  
 
-
 # Memuat model DistilBERT untuk ekstraksi embedding
 distilbert_model = DistilBertModel.from_pretrained(model_path)
 tokenizer = DistilBertTokenizer.from_pretrained(model_path)
@@ -48,9 +47,6 @@ y_pred = clf.predict(X_test)
 
 # Evaluasi akurasi model
 accuracy = accuracy_score(y_test, y_pred)
-
-# Menampilkan akurasi
-#st.write(f'Accuracy: {accuracy * 100:.2f}%')
 
 # Fungsi untuk prediksi sentimen menggunakan model sklearn
 def predict_sentiment(text):
