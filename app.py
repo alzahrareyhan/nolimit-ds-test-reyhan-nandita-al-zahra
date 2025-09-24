@@ -3,13 +3,13 @@ from transformers import DistilBertTokenizer, DistilBertForSequenceClassificatio
 import torch
 from safetensors.torch import load_file
 
-# Path ke folder model (pastikan folder saved_model ada dan berisi model yang benar)
+# Path ke folder model
 model_path = 'saved_model'
 
-# Memuat state_dict dari file .safetensors
+# Memuat state_dict dari file safetensors
 state_dict = load_file(f"{model_path}/model.safetensors")
 
-# Tentukan perangkat yang digunakan (menggunakan CPU)
+# Tentukan perangkat yang digunakan (menggunakan CPU karena kemungkinan tidak ada GPU di Streamlit Cloud)
 device = torch.device("cpu")  # Gunakan CPU untuk deployment
 
 # Inisialisasi model DistilBERT dengan konfigurasi yang sesuai
@@ -18,7 +18,7 @@ model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labe
 # Memuat state_dict ke model
 model.load_state_dict(state_dict)
 
-# Pastikan model dipindahkan ke perangkat yang sesuai
+# Memindahkan model ke perangkat yang sesuai (CPU)
 model.to(device)
 
 # Memuat tokenizer
@@ -49,13 +49,16 @@ user_input = st.text_area("Enter your movie review here:")
 # Tombol Submit
 if st.button("Submit"):
     if user_input:
-        # Prediksi sentimen dengan model DistilBERT
-        sentiment = predict_sentiment(user_input)
-        
-        # Menampilkan hasil prediksi
-        if sentiment == 1:
-            st.success("The sentiment is **Positive**!")
-        else:
-            st.error("The sentiment is **Negative**!")
+        try:
+            # Prediksi sentimen dengan model DistilBERT
+            sentiment = predict_sentiment(user_input)
+            
+            # Menampilkan hasil prediksi
+            if sentiment == 1:
+                st.success("The sentiment is **Positive**!")
+            else:
+                st.error("The sentiment is **Negative**!")
+        except RuntimeError as e:
+            st.error(f"Error: {e}")
     else:
         st.warning("Please enter a movie review to analyze.")
