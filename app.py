@@ -1,58 +1,35 @@
 import streamlit as st
-import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+import torch
 
-# Memuat dataset IMDB CSV (pastikan file imdb.csv ada di direktori yang sama dengan app.py)
-@st.cache
-def load_data():
-    df = pd.read_csv('IMDB/imdb.csv')  # Ganti dengan path file yang sesuai jika tidak ada di direktori yang sama
-    return df
+# Path ke folder model (pastikan folder saved_model ada dan berisi model yang benar)
+model_path = 'saved_model'
 
-# Muat data
-df = load_data()
+# Memuat model DistilBERT untuk klasifikasi sentimen dan tokenizer dari folder saved_model
+model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labels=2)
+tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
-# Menampilkan beberapa baris data untuk pengecekan
-st.write("Dataset Sample:")
-st.write(df.head())
+# Memastikan model menggunakan perangkat yang tepat (GPU atau CPU)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = model.to(device)
 
-# Pisahkan fitur (review) dan label (sentiment)
-train_texts = df['review'].tolist()  # List ulasan (review)
-train_labels = df['sentiment'].tolist()  # List label sentimen (sentiment)
-
-# Membuat TF-IDF Vectorizer
-vectorizer = TfidfVectorizer()
-
-# Mendapatkan fitur TF-IDF untuk teks
-train_features = vectorizer.fit_transform(train_texts)
-
-# Membagi data untuk pelatihan dan pengujian
-X_train, X_test, y_train, y_test = train_test_split(train_features, train_labels, test_size=0.2, random_state=42)
-
-# Latih model menggunakan Logistic Regression
-clf = LogisticRegression(max_iter=1000)
-clf.fit(X_train, y_train)
-
-# Prediksi dengan model yang telah dilatih
-y_pred = clf.predict(X_test)
-
-# Evaluasi akurasi model
-accuracy = accuracy_score(y_test, y_pred)
-
-# Menampilkan akurasi
-st.write(f'Accuracy: {accuracy * 100:.2f}%')
-
-# Fungsi untuk prediksi sentimen menggunakan model sklearn
+# Fungsi untuk prediksi sentimen menggunakan model DistilBERT
 def predict_sentiment(text):
-    # Mengubah input teks ke dalam bentuk TF-IDF
-    text_features = vectorizer.transform([text])
-    sentiment = clf.predict(text_features)  # Prediksi sentimen menggunakan model sklearn
-    return sentiment[0]  # Mengembalikan hasil prediksi
+    # Tokenisasi input teks
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512).to(device)
+    
+    # Prediksi menggunakan model dengan hidden states
+    with torch.no_grad():
+        outputs = model(**inputs)
+    
+    # Mengambil logits dan menghitung prediksi sentimen (0 = Negatif, 1 = Positif)
+    logits = outputs.logits
+    predictions = torch.argmax(logits, dim=-1)  # Mengambil prediksi dengan nilai tertinggi
+    
+    return predictions.item()
 
 # Judul dan penjelasan aplikasi
-st.title('Sentiment Analysis - IMDB Movie Reviews')
+st.title('Sentiment Analysis - Movie Reviews with DistilBERT')
 st.write("Enter a movie review, and the model will predict whether the sentiment is positive or negative.")
 
 # Input teks dari pengguna
@@ -61,7 +38,7 @@ user_input = st.text_area("Enter your movie review here:")
 # Tombol Submit
 if st.button("Submit"):
     if user_input:
-        # Prediksi sentimen dengan model sklearn
+        # Prediksi sentimen dengan model DistilBERT
         sentiment = predict_sentiment(user_input)
         
         # Menampilkan hasil prediksi
