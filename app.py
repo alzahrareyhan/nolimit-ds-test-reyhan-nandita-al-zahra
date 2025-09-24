@@ -16,10 +16,14 @@ def load_model():
 # Fungsi untuk prediksi
 def predict(text, tokenizer, model):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
+    
+    # Pastikan tensor berada di perangkat yang benar
     with torch.no_grad():
         logits = model(**inputs).logits
-    prediction = torch.argmax(logits, dim=-1)
-    return prediction.item()
+        
+        # Pindahkan tensor ke CPU sebelum mengakses item
+        prediction = torch.argmax(logits, dim=-1).cpu()  # Memindahkan tensor ke CPU
+        return prediction.item()  # Akses nilai menggunakan .item() setelah dipindahkan ke CPU
 
 # Memuat model
 tokenizer, model = load_model()
