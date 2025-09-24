@@ -25,9 +25,13 @@ def get_embedding(text):
     
     # Mengambil last hidden state dan menghitung rata-rata untuk embedding
     last_hidden_state = outputs.last_hidden_state.mean(dim=1).squeeze()
+
+    # Pastikan tensor ada di CPU sebelum memanggil .numpy() dan pastikan tensor bukan meta tensor
+    if last_hidden_state.device.type == 'meta':
+        raise ValueError("The model did not return valid data (meta tensor).")
     
-    # Memastikan tensor ada di CPU sebelum memanggil .numpy()
     return last_hidden_state.cpu().numpy()
+
 
 # Dataset Dummy untuk Latihan (ganti dengan dataset asli Anda)
 # Data latih dan label
