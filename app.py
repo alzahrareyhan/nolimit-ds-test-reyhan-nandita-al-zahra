@@ -13,18 +13,23 @@ def load_model():
     
     return tokenizer, model
 
+
 # Fungsi untuk prediksi
 def predict(text, tokenizer, model):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
     
-    # Pastikan tensor berada di perangkat yang benar
+    # Pastikan input berada di perangkat yang sama dengan model (CPU atau GPU)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)
+    inputs = {key: value.to(device) for key, value in inputs.items()}
+    
+    # Melakukan prediksi dan memastikan tensor berada di perangkat yang benar
     with torch.no_grad():
         logits = model(**inputs).logits
         
-        # Pindahkan tensor ke CPU sebelum mengakses item
-        prediction = torch.argmax(logits, dim=-1).cpu()  # Memindahkan tensor ke CPU
-        return prediction.item()  # Akses nilai menggunakan .item() setelah dipindahkan ke CPU
-
+        # Memastikan tensor berada di CPU sebelum melakukan .item()
+        prediction = torch.argmax(logits, dim=-1).cpu()
+        return prediction.item()  # Mengakses nilai scalar
 # Memuat model
 tokenizer, model = load_model()
 
