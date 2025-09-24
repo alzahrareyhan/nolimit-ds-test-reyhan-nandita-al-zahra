@@ -1,14 +1,15 @@
 import streamlit as st
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
+# Fungsi untuk memuat model dan tokenizer dari Hugging Face
 @st.cache_resource
 def load_model():
-    model_path = 'saved_model/model'  # Gunakan path tanpa ekstensi safetensors jika bisa menggunakan model standar
-    
-    # Tokenizer dan model standar Hugging Face
-    tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
-    model = AutoModelForSequenceClassification.from_pretrained(model_path)
+    # Ganti dengan nama model di Hugging Face
+    model_name = 'reyhannandita/analisissentimen'  
+    # Memuat tokenizer dan model dari Hugging Face
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForSequenceClassification.from_pretrained(model_name)
     
     return tokenizer, model
 
@@ -23,8 +24,8 @@ def predict(text, tokenizer, model):
 # Memuat model
 tokenizer, model = load_model()
 
-# Mengatur UI Streamlit
-st.title("Sentiment Analysis with Model.safetensors")
+# Streamlit UI
+st.title("Sentiment Analysis with Hugging Face Model")
 st.write("Masukkan teks untuk analisis sentimen")
 
 # Input teks dari pengguna
@@ -40,4 +41,3 @@ if st.button('Prediksi'):
             st.write("Prediksi: Negatif")
     else:
         st.write("Harap masukkan teks untuk dianalisis.")
-
