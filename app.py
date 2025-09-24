@@ -14,7 +14,7 @@ model_path = 'saved_model'  # Sesuaikan dengan path model Anda
 distilbert_model = DistilBertModel.from_pretrained(model_path)
 tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
-# Fungsi untuk mendapatkan embedding
+# Fungsi untuk mendapatkan embedding langsung menggunakan DistilBERT
 def get_embedding(text):
     # Tokenisasi input teks
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
@@ -25,10 +25,6 @@ def get_embedding(text):
     
     # Mengambil last hidden state dan menghitung rata-rata untuk embedding
     last_hidden_state = outputs.last_hidden_state.mean(dim=1).squeeze()
-
-    # Pastikan tensor ada di CPU sebelum memanggil .numpy() dan pastikan tensor bukan meta tensor
-    if last_hidden_state.device.type == 'meta':
-        raise ValueError("The model did not return valid data (meta tensor).")
     
     return last_hidden_state.cpu().numpy()
 
@@ -58,8 +54,15 @@ st.write(f'Accuracy: {accuracy * 100:.2f}%')
 
 # Fungsi untuk prediksi sentimen menggunakan model sklearn
 def predict_sentiment(text):
-    embedding = get_embedding(text)  # Dapatkan embedding
-    sentiment = clf.predict([embedding])  # Prediksi sentimen menggunakan model sklearn
+    # Tokenisasi input teks
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
+    
+    # Mengambil embedding dari DistilBERT dan langsung melakukan prediksi
+    with torch.no_grad():
+        outputs = distilbert_model(**inputs)
+    last_hidden_state = outputs.last_hidden_state.mean(dim=1).squeeze()
+
+    sentiment = clf.predict([last_hidden_state.cpu().numpy()])
     return sentiment[0]  # Mengembalikan hasil prediksi
 
 # Fungsi untuk mencari ulasan terdekat menggunakan cosine similarity
