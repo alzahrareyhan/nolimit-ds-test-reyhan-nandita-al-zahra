@@ -91,7 +91,6 @@ The flowchart is divided into two parts: training and inference.Training flowcha
 6. Similarity search using KNN : The query embedding compared with training set embedding using KNN. Retrives the 5 closest distance of review.
 7. Final output for classification is label: positive or Negative
 8. Final output for similarity search is the top 5 closest distance review with the distance itself.
-de
 
 
 
