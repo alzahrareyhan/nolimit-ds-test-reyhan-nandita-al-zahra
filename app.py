@@ -27,8 +27,8 @@ def get_embedding(text):
     last_hidden_state = outputs.last_hidden_state.mean(dim=1).squeeze()
     return last_hidden_state.numpy()
 
-# Dataset Dummy untuk Latihan (ganti dengan dataset asli Anda)
-# Data latih dan label
+
+# Data ulasan
 train_texts = ["I love this movie", "This movie is bad", "Amazing film", "Not worth watching", "Great movie"]
 train_labels = [1, 0, 1, 0, 1]  # 1 = Positif, 0 = Negatif
 
