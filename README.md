@@ -13,58 +13,58 @@ This app predicts the sentiment of movie reviews. It also gives you the closest 
 
 # Usage 
 1. Enter a review of a movie, for example: (more sample input available at `sample_input.txt`)
-Komentar Positif:
-'''
+- Komentar Positif:
+```
 "I absolutely loved this movie! The acting was superb and the storyline was captivating."
-'''
-'''
+```
+```
 "This is one of the best films I've seen in a long time. Amazing visuals and great performances!"
-'''
-'''
+```
+```
 "What a fantastic experience! The movie kept me on the edge of my seat from start to finish."
-'''
-'''
+```
+```
 "The movie was heartwarming, and the characters felt very real. I would definitely watch it again!"
-'''
-'''
+```
+```
 "I had such a great time watching this film. The plot twists were incredible and the acting was flawless."
-'''
-'''
+```
+```
 "A must-watch for anyone who loves adventure and drama! Highly recommended."
-'''
-'''
+```
+```
 "The cinematography was stunning, and the soundtrack really enhanced the overall experience."
-'''
-'''
+```
+```
 "Such an inspiring movie! It really made me think about life in a new way."
-'''
+```
 
 
-Komentar Negatif:
-'''
+- Komentar Negatif:
+```
 "The movie was terrible. The plot was predictable, and the acting was flat."
-'''
-'''
+```
+```
 "I didn't enjoy this film at all. It was boring and lacked depth."
-'''
-'''
+```
+```
 "What a waste of time! The movie was too slow, and the characters were not relatable."
-'''
-'''
+```
+```
 "The CGI was bad, and the storyline was hard to follow. Definitely not worth watching."
-'''
-'''
+```
+```
 "I was really disappointed with this movie. It was full of clichés and failed to engage me."
-'''
-'''
+```
+```
 "The pacing was awful, and I found myself checking my watch multiple times."
-'''
-'''
+```
+```
 "A dull and forgettable experience. I wouldn’t recommend it to anyone."
-'''
-'''
+```
+```
 "The movie felt like a complete flop. The dialogue was cringe-worthy, and the plot was too predictable."
-'''
+```
 
 2. Click the button after filling the review.
 
